@@ -3,7 +3,7 @@ import java.util.Scanner;
 public class Worker
 {
     private String Fname, Lname;
-    private double dependents, hourly_rate, numberHours, LocalT, FederalT, stateT, TotalSal;
+    private double dependents, hourly_rate, numberHours, LocalT, FederalT, StateT, TotalSal, LocalTWTD, FederalTWTD, StateTWTD;
     public Worker()
     {
         Fname="";
@@ -13,21 +13,42 @@ public class Worker
         numberHours=0;
         LocalT=0;
         FederalT=0;
-        stateT=0;
+        StateT=0;
+        LocalTWTD=0;
+        StateTWTD=0;
+        FederalTWTD=0;
+
         TotalSal= hourly_rate*numberHours;
     }
 
     public void writeOutput()
     {
+        System.out.println("Worker: "+ this.Fname+ " "+ this.Lname);
+        System.out.println("One Week: "+ this.numberHours);
+        System.out.println("Amount per Hour: "+ this.hourly_rate);
+        System.out.println("Total for one week:\t\t\t" + TotalSal);
+        System.out.println("\t\tCurrent\t\tYr.To Date");
+        double buffer1=FederalTCal()+this.FederalTWTD;
+        System.out.println("Federal\t\t"+FederalTCal()+"\t\t"+buffer1);
+        double buffer2= StateTCal()+this.StateTWTD;
+        System.out.println("State\t\t"+StateTCal()+"\t\t"+buffer2);
+        double buffer3=LocalTCal()+this.LocalTWTD ;
+        if (buffer3>517.50)
+            buffer3=517.50;
+        System.out.println("Local\t\t"+LocalTCal()+"\t\t"+buffer3);
+
+
+
+        /*
         System.out.println("First name: "+ this.Fname);
         System.out.println("Last name: "+ this.Lname);
         System.out.println("Dependents: "+ this.dependents);
-        System.out.println("Hourly rate: "+ this.hourly_rate);
-        System.out.println("Number of hours worked: "+ this.numberHours);
-        //System.out.println("Local Tax to be paid: " + LocalTCal());
-        //System.out.println("Federal Tax to be paid: " + FederalTCal());
-        //System.out.println("State Tax to be paid: " + StateTCal());
 
+
+        //
+
+        //System.out.println("State Tax to be paid: " + StateTCal());
+        */
     }
 
     public void readInput()
@@ -43,9 +64,15 @@ public class Worker
         this.hourly_rate= sc.nextDouble();
         System.out.println("Enter number of hours you worked: ");
         this.numberHours= sc.nextDouble();
+        System.out.println("Local tax withheld to date: ");
+        this.LocalTWTD=sc.nextDouble();
+        System.out.println("Federal tax withheld to date");
+        this.FederalTWTD=sc.nextDouble();
+        System.out.println("State tax withheld to date");
+        this.StateTWTD=sc.nextDouble();
 
         if (numberHours <= 40) {
-            TotalSal = numberHours * hourly_rate;
+            TotalSal = this.numberHours * this.hourly_rate;
         }
 
         else{
@@ -57,25 +84,45 @@ public class Worker
     double LocalTCal()
     {
         if (TotalSal <= 45000){
-            LocalT= 0.015*TotalSal;
+            LocalT= 0.0115*TotalSal;
         }
         else{
-            LocalT= 0.015*45000;
+            LocalT= 0.0115*45000;
         }
         return LocalT;
     }
-/*
+
     double FederalTCal()
     {
+        double yearly= TotalSal*52;
 
+        if (yearly >= 0 && yearly <=20000)
+            this.FederalT= (TotalSal- (this.dependents*15))*0.1;
+        else if(yearly>20000 && yearly<=30000)
+            this.FederalT= (TotalSal- (this.dependents*15))*0.2;
+        else
+            this.FederalT= (TotalSal- (this.dependents*15))*0.3;
+
+        return FederalT;
     }
 
     double StateTCal()
     {
+        double yearly= TotalSal*52;
+        if (yearly >= 0 && yearly <=30000)
+            StateT= TotalSal*0.05;
+        else
+            StateT= TotalSal*0.1;
+        return StateT;
+    }
+
+    void calculateData()
+    {
+        StateTCal();
+        FederalTCal();
+        LocalTCal();
 
     }
-*/
-
 
 
     public static void main(String[] args)
@@ -91,7 +138,7 @@ public class Worker
             worker = new Worker ();
             System.out.println("Enter data for worker number " + count);
             worker.readInput();
-            //worker.calculateData();
+            worker.calculateData();
             worker.writeOutput( );
             //clerk.colectDataForEmployerReport(worker);
         }
